@@ -1,0 +1,89 @@
+
+{% extends "base.html" %}
+
+{% block title %}Your Cart | Street Bites{% endblock %}
+
+{% block content %}
+<section class="cart-section container py-5">
+
+    <h1>Your Shopping Cart</h1>
+    <p class="text-muted">Your Street Bites favourites, ready to order.</p>
+
+    {% with messages = get_flashed_messages() %}
+        {% for message in messages %}
+            <div class="alert alert-warning">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
+
+    {% if cart_items %}
+        <div class="cart-list mt-4">
+
+            {% for item in cart_items %}
+                <div class="cart-item">
+                    <div class="cart-item-info">
+                        <h5>{{ item.name }}</h5>
+                        <p>R{{ "%.2f"|format(item.price) }} each</p>
+                    </div>
+
+                    <form method="POST"
+                          action="{{ url_for('update_cart', product_id=item.id) }}"
+                          class="cart-quantity-form">
+
+                        <label for="quantity-{{ item.id }}">Quantity</label>
+                        <input
+                            id="quantity-{{ item.id }}"
+                            type="number"
+                            name="quantity"
+                            min="1"
+                            max="99"
+                            value="{{ item.quantity }}"
+                            required>
+
+                        <button type="submit" class="btn btn-outline-dark">
+                            Update
+                        </button>
+                    </form>
+
+                    <strong>R{{ "%.2f"|format(item.total) }}</strong>
+
+                    <form method="POST"
+                          action="{{ url_for('remove_from_cart', product_id=item.id) }}">
+                        <button type="submit" class="btn btn-outline-danger">
+                            Remove
+                        </button>
+                    </form>
+                </div>
+            {% endfor %}
+
+        </div>
+
+        <div class="cart-summary mt-4">
+            <h3>Subtotal: R{{ "%.2f"|format(subtotal) }}</h3>
+            <p class="text-muted">
+                Delivery is R50 within 5 km or R80 over 5 km from us.
+                We confirm delivery fees before fulfillment; the cart total excludes delivery.
+                <a href="{{ url_for('where_to_find_us') }}">See delivery areas</a>.
+            </p>
+
+            <a href="{{ url_for('menu') }}" class="btn btn-outline-secondary">
+                Continue Shopping
+            </a>
+
+            <a href="{{ url_for('checkout') }}" class="checkout-submit">
+    Proceed to Checkout
+</a>
+            </a>
+        </div>
+
+    {% else %}
+        <div class="empty-cart mt-5">
+            <h3>Your cart is empty</h3>
+            <p>Looks like you haven't added any delicious food yet.</p>
+            <a href="{{ url_for('menu') }}" class="btn btn-warning">
+                Explore the Menu
+            </a>
+        </div>
+    {% endif %}
+
+</section>
+{% endblock %}

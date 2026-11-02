@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Our Menu | Street Bites{% endblock %}
+
+{% macro menu_card(product_id, name, description, image, price) %}
+<article class="menu-card">
+    <img class="menu-food-image"
+         src="{{ url_for('static', filename=image) }}"
+         alt="Illustrative photo for {{ name }}; actual dish may differ."
+         loading="lazy">
+    <div class="menu-card-content">
+        <h3>{{ name }}</h3>
+        <p>{{ description }}</p>
+
+        <dl class="menu-card-details">
+            <div>
+                <dt>Portion size</dt>
+                <dd>Not provided</dd>
+            </div>
+            <div>
+                <dt>Dietary &amp; allergens</dt>
+                <dd>Not provided — please ask us</dd>
+            </div>
+        </dl>
+
+        <div class="menu-card-bottom">
+            <span class="menu-price">{{ price }}</span>
+            <form method="POST" action="{{ url_for('add_to_cart', product_id=product_id) }}">
+                <button type="submit" class="menu-order-btn">Add to Order</button>
+            </form>
+        </div>
+    </div>
+</article>
+{% endmacro %}
+
+{% block content %}
+
+<section class="menu-page">
+    <div class="menu-heading">
+        <p class="menu-subtitle">FRESH FOOD. BIG FLAVOUR.</p>
+        <h1>Explore Our Menu</h1>
+        <p>Discover your favourites, freshly prepared for you.</p>
+    </div>
+
+    <div class="menu-container">
+        <aside class="menu-information" aria-label="Food information notice">
+            <strong>Dietary and allergy information</strong>
+            <p>
+                Portion sizes and ingredient/allergen details are not yet provided.
+                If you have an allergy or dietary requirement, please
+                <a href="{{ url_for('contact_us') }}">contact us before ordering</a>.
+            </p>
+            <p class="menu-photo-note">Menu photos are illustrations; the actual dish may differ.</p>
+        </aside>
+
+        <!-- Menu items grid -->
+
+        <h2 class="menu-category">Burgers</h2>
+        <div class="menu-grid">
+            {{ menu_card('1', 'Classic Burger', 'Juicy beef patty, fresh lettuce, tomato and our signature sauce.', 'burger.png', 'R55.00') }}
+            {{ menu_card('2', 'Cheese Burger', 'A delicious beef burger topped with melted cheese and fresh salad.', 'cheeseburger.jpg', 'R65.00') }}
+            {{ menu_card('3', 'Double Beef Burger', 'Two beef patties, cheese and signature Street Bites sauce.', 'doublebeef.jpg', 'R85.00') }}
+        </div>
+
+        <h2 class="menu-category">Chicken</h2>
+        <div class="menu-grid">
+            {{ menu_card('4', 'Crispy Chicken Wings', 'Crispy golden chicken served with a flavourful coating.', 'wings.png', 'R60.00') }}
+            {{ menu_card('5', 'Full Chicken & Chips', 'Crispy chicken served with a portion of golden chips.', 'fullchicken.png', 'R75.00') }}
+            {{ menu_card('6', 'Chicken Wrap', 'Seasoned chicken, fresh vegetables and creamy sauce in a wrap.', 'wrap.jpg', 'R50.00') }}
+        </div>
+
+        <h2 class="menu-category">Sides &amp; Drinks</h2>
+        <div class="menu-grid">
+            {{ menu_card('7', 'Regular Chips', 'Hot, crispy and lightly salted golden chips.', 'regular.jpg', 'R20.00') }}
+            {{ menu_card('8', 'Soft Drink', 'A refreshing cold drink to enjoy with your meal.', 'drinks.jpg', 'R30.00 (2L)') }}
+            {{ menu_card('9', 'xLarge Chips', 'Crispy chips topped with cheese and our signature sauce.', 'loaded.jpg', 'R40.00') }}
+        </div>
+
+        <h2 class="menu-category">eKasi &amp; Treats</h2>
+        <div class="menu-grid">
+            {{ menu_card('7', 'AmaGwinya', 'AmaGwinya are traditional South African deep-fried dough balls with a soft, fluffy inside and a golden, crispy outside. Enjoy them plain or filled with mince, cheese, polony or atchar for a delicious township favourite.', 'amagwinya.jpg', 'R5.00') }}
+            {{ menu_card('8', 'Kota', 'A kota (also known as a spathlo) is a popular South African street-food sandwich made from a hollowed-out quarter loaf of white bread stuffed with slap chips (soft, vinegar-soaked fries), meats, cheese, and atchar', 'kota.jpg', 'R18.00') }}
+            {{ menu_card('9', 'Pizza', 'made from a flattened, leavened wheat dough base topped with tomato sauce, melted cheese (typically mozzarella), and a variety of meats, vegetables, or herbs, baked at high temperatures in wood-fired, brick, or electric ovens.', 'pizza.jpg', 'R40.00') }}
+
+    
+    </div>
+</section>
+
+{% endblock %}

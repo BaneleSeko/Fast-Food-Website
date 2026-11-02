@@ -1,0 +1,120 @@
+
+{% extends "base.html" %}
+
+{% block title %}Checkout | Street Bites{% endblock %}
+
+{% block content %}
+<section class="checkout-page">
+    <div class="checkout-container">
+        <div class="checkout-heading">
+            <p class="menu-subtitle">ALMOST THERE</p>
+            <h1>Checkout</h1>
+            <p>Confirm your order and tell us where to bring your food.</p>
+        </div>
+
+        <div class="checkout-layout">
+            <form method="POST" action="{{ url_for('checkout') }}"
+                  class="checkout-form">
+
+                  <!-- Customer Details-->
+                <h2>Your Details</h2>
+
+                <label for="customer_name">Full name</label>
+                <input type="text" id="customer_name" name="customer_name"
+                       value="{{ customer_name }}" maxlength="100" required>
+
+                <label for="phone">Phone number</label>
+                <input type="tel" id="phone" name="phone"
+                       maxlength="30" placeholder="e.g. 071 234 5678"
+                       required>
+
+                <h2>Order Type</h2>
+
+                <label for="fulfillment">Choose how to receive your order</label>
+                <select id="fulfillment" name="fulfillment" required>
+                    <option value="Delivery">Delivery</option>
+                    <option value="Collection">Collection</option>
+                </select>
+
+                <div id="address-field">
+                    <label for="delivery_address">Delivery address</label>
+                    <textarea id="delivery_address" name="delivery_address"
+                              rows="3" maxlength="500"
+                              placeholder="Street, suburb and any delivery instructions"></textarea>
+                    <p class="checkout-note">
+                        Delivery areas: {{ DELIVERY_AREAS|join(', ') }}.
+                        Fee: R50 within 5 km; R80 over 5 km from us. We will
+                        confirm the fee before fulfilling your order.
+                    </p>
+                </div>
+
+                <h2>Payment Method</h2>
+
+                <label for="payment_method">Choose payment</label>
+                <select id="payment_method" name="payment_method" required>
+                    <option value="Cash on Delivery">Cash on Delivery</option>
+                    <option value="Pay on Collection">Pay on Collection</option>
+                </select>
+
+                <button type="submit" class="checkout-submit">
+                    Place Order
+                </button>
+            </form>
+
+            <aside class="checkout-summary">
+                <h2>Your Order</h2>
+
+                {% for item in cart_items %}
+                <div class="checkout-item">
+                    <div>
+                        <strong>{{ item.name }}</strong>
+                        <p>Qty: {{ item.quantity }} × R{{ "%.2f"|format(item.price) }}</p>
+                    </div>
+                    <strong>R{{ "%.2f"|format(item.total) }}</strong>
+                </div>
+                {% endfor %}
+
+                <div class="checkout-total">
+                    <span>Food subtotal</span>
+                    <strong>R{{ "%.2f"|format(subtotal) }}</strong>
+                </div>
+
+                <p class="checkout-note">
+                    The total shown does not include the delivery fee. We will
+                    confirm the applicable fee before fulfilling your order.
+                </p>
+
+                <a href="{{ url_for('cart') }}" class="back-to-cart">
+                    Return to Cart
+                </a>
+            </aside>
+        </div>
+    </div>
+</section>
+
+
+<!-- JavaScript for dynamic checkout options -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const fulfillment = document.getElementById("fulfillment");
+    const payment = document.getElementById("payment_method");
+    const address = document.getElementById("delivery_address");
+    const addressField = document.getElementById("address-field");
+
+    function updateCheckoutOptions() {
+        const delivery = fulfillment.value === "Delivery";
+
+        addressField.hidden = !delivery;
+        address.required = delivery;
+
+        payment.value = delivery
+            ? "Cash on Delivery"
+            : "Pay on Collection";
+    }
+
+    fulfillment.addEventListener("change", updateCheckoutOptions);
+    updateCheckoutOptions();
+});
+</script>
+{% endblock %}
+```

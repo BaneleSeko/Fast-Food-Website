@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Order Confirmed | Street Bites{% endblock %}
+
+{% block content %}
+<section class="confirmation-page">
+    <div class="confirmation-card">
+        <div class="confirmation-icon">✓</div>
+
+        <p class="menu-subtitle">THANK YOU FOR YOUR ORDER</p>
+        <h1>Order Placed Successfully!</h1>
+
+        <p>
+            Thanks, {{ order["customer_name"] }}.
+            Your order has been recorded.
+        </p>
+
+        <div class="confirmation-details">
+            <p><strong>Order number:</strong> #{{ order["id"] }}</p>
+            <p><strong>Status:</strong> {{ order["status"] }}</p>
+            <p><strong>Order type:</strong> {{ order["fulfillment"] }}</p>
+            <p><strong>Payment:</strong> {{ order["payment_method"] }}</p>
+
+            {% if order["fulfillment"] == "Delivery" %}
+            <p><strong>Delivery address:</strong> {{ order["delivery_address"] }}</p>
+            {% endif %}
+        </div>
+
+        <h2>Order Summary</h2>
+
+        {% for item in items %}
+        <div class="confirmation-item">
+            <span>{{ item["product_name"] }} × {{ item["quantity"] }}</span>
+            <strong>R{{ "%.2f"|format(item["line_total"]) }}</strong>
+        </div>
+        {% endfor %}
+
+        <div class="confirmation-total">
+            <span>Food subtotal</span>
+            <strong>R{{ "%.2f"|format(order["total"]) }}</strong>
+        </div>
+        {% if order["fulfillment"] == "Delivery" %}
+        <p class="checkout-note">
+            Delivery fee is confirmed separately before fulfillment and is not
+            included in this food subtotal.
+        </p>
+        {% endif %}
+
+        <a href="{{ url_for('my_orders') }}" class="checkout-submit">
+            Track My Orders
+        </a>
+        <a href="{{ url_for('menu') }}" class="back-to-cart">
+            Back to Menu
+        </a>
+    </div>
+</section>
+{% endblock %}
+```

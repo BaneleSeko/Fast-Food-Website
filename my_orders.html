@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}My Orders | Street Bites{% endblock %}
+
+{% block content %}
+<section class="my-orders-page">
+    <div class="my-orders-container">
+        <div class="my-orders-heading">
+            <p class="menu-subtitle">YOUR STREET BITES ORDERS</p>
+            <h1>My Orders</h1>
+            <p>Review your past orders and check their latest status.</p>
+        </div>
+
+        {% if orders %}
+            <div class="my-orders-list">
+                {% for order in orders %}
+                <article class="my-order-card">
+                    <div class="my-order-header">
+                        <div>
+                            <h2>Order #{{ order["id"] }}</h2>
+                            <p>{{ order["created_at"] }}</p>
+                        </div>
+                        <span class="my-order-status">{{ order["status"] }}</span>
+                    </div>
+
+                    <div class="my-order-meta">
+                        <span><strong>Type:</strong> {{ order["fulfillment"] }}</span>
+                        <span><strong>Payment:</strong> {{ order["payment_method"] }}</span>
+                    </div>
+
+                    <div class="my-order-items">
+                        {% for item in items_by_order.get(order["id"], []) %}
+                        <div class="my-order-item">
+                            <span>{{ item["product_name"] }} × {{ item["quantity"] }}</span>
+                            <strong>R{{ "%.2f"|format(item["line_total"]) }}</strong>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="my-order-footer">
+                        <strong>Food subtotal: R{{ "%.2f"|format(order["total"]) }}</strong>
+                        <a href="{{ url_for('order_confirmation', order_id=order['id']) }}">
+                            View order details
+                        </a>
+                    </div>
+                    {% if order["fulfillment"] == "Delivery" %}
+                    <p class="my-order-delivery-note">
+                        Delivery fee is confirmed separately and is not included in this subtotal.
+                    </p>
+                    {% endif %}
+                </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="my-orders-empty">
+                <h2>No orders yet</h2>
+                <p>Once you place an order, you can follow its status here.</p>
+                <a href="{{ url_for('menu') }}" class="button">Explore the Menu</a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

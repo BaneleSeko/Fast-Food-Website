@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Orders | Street Bites{% endblock %}
+
+{% block content %}
+<section class="admin-page">
+    <div class="admin-container">
+        <div class="admin-heading">
+            <div>
+                <p class="menu-subtitle">STREET BITES MANAGEMENT</p>
+                <h1>Order Dashboard</h1>
+                <p>Review incoming orders, approve them, and update their progress.</p>
+            </div>
+        </div>
+
+        <div class="admin-stats">
+            <div class="admin-stat">
+                <span>Total Orders</span>
+                <strong>{{ status_counts.values() | sum }}</strong>
+            </div>
+            <div class="admin-stat">
+                <span>Pending Approval</span>
+                <strong>{{ status_counts["Pending"] }}</strong>
+            </div>
+            <div class="admin-stat">
+                <span>Approved</span>
+                <strong>{{ status_counts["Approved"] }}</strong>
+            </div>
+            <div class="admin-stat">
+                <span>Preparing</span>
+                <strong>{{ status_counts["Preparing"] }}</strong>
+            </div>
+            <div class="admin-stat">
+                <span>Completed</span>
+                <strong>{{ status_counts["Completed"] }}</strong>
+            </div>
+        </div>
+
+        <form method="GET"
+              action="{{ url_for('admin_orders') }}"
+              class="admin-filter">
+            <label for="status">Filter by status</label>
+            <select name="status" id="status">
+                <option value="">All orders</option>
+                {% for status in statuses %}
+                <option value="{{ status }}"
+                    {% if selected_status == status %}selected{% endif %}>
+                    {{ status }}
+                </option>
+                {% endfor %}
+            </select>
+            <button type="submit">Filter</button>
+            <a href="{{ url_for('admin_orders') }}">Clear</a>
+        </form>
+
+        {% if order_list %}
+            {% for entry in order_list %}
+            {% set order = entry.order %}
+            <article class="admin-order">
+                <div class="admin-order-header">
+                    <div>
+                        <h2>Order #{{ order["id"] }}</h2>
+                        <p class="admin-order-date">{{ order["created_at"] }}</p>
+                    </div>
+                    <span class="admin-status status-{{ order['status']|lower|replace(' ', '-') }}">
+                        {{ order["status"] }}
+                    </span>
+                </div>
+
+                <div class="admin-order-details">
+                    <div>
+                        <span>Customer</span>
+                        <strong>{{ order["customer_name"] }}</strong>
+                    </div>
+                    <div>
+                        <span>Account email</span>
+                        <strong>{{ order["account_email"] }}</strong>
+                    </div>
+                    <div>
+                        <span>Phone</span>
+                        <strong><a href="tel:{{ order['phone']|replace(' ', '') }}">{{ order["phone"] }}</a></strong>
+                    </div>
+                    <div>
+                        <span>Order type</span>
+                        <strong>{{ order["fulfillment"] }}</strong>
+                    </div>
+                    <div>
+                        <span>Payment</span>
+                        <strong>{{ order["payment_method"] }}</strong>
+                    </div>
+                    {% if order["fulfillment"] == "Delivery" %}
+                    <div class="admin-address">
+                        <span>Delivery address</span>
+                        <strong>{{ order["delivery_address"] }}</strong>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <h3>Items ordered</h3>
+                <div class="admin-items">
+                    {% for item in entry["items"] %}
+                    <div class="admin-item">
+                        <span>{{ item["product_name"] }} × {{ item["quantity"] }}</span>
+                        <strong>R{{ "%.2f"|format(item["line_total"]) }}</strong>
+                    </div>
+                    {% else %}
+                    <p class="admin-no-items">No item details were found for this order.</p>
+                    {% endfor %}
+                </div>
+
+                <div class="admin-order-footer">
+                    <div class="admin-order-total">
+                        <span>Food subtotal</span>
+                        <strong>R{{ "%.2f"|format(order["total"]) }}</strong>
+                    </div>
+
+                    <div class="admin-order-actions">
+                        {% if order["status"] == "Pending" %}
+                        <form method="POST"
+                              action="{{ url_for('approve_order', order_id=order['id']) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <button type="submit" class="admin-approve-button">
+                                Approve Order
+                            </button>
+                        </form>
+                        {% endif %}
+
+                        <form method="POST"
+                              action="{{ url_for('update_order_status', order_id=order['id']) }}"
+                              class="admin-status-form">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <label for="status-{{ order['id'] }}">Update status</label>
+                            <select name="status" id="status-{{ order['id'] }}" required>
+                                {% for status in statuses %}
+                                <option value="{{ status }}"
+                                    {% if order["status"] == status %}selected{% endif %}>
+                                    {{ status }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit">Save Status</button>
+                        </form>
+                    </div>
+                </div>
+                {% if order["fulfillment"] == "Delivery" %}
+                <p class="admin-delivery-note">
+                    Delivery fee is confirmed separately and is not included in this food subtotal.
+                </p>
+                {% endif %}
+            </article>
+            {% endfor %}
+        {% else %}
+            <div class="admin-empty">
+                <h2>No orders found</h2>
+                <p>
+                    {% if selected_status %}
+                    There are no {{ selected_status|lower }} orders.
+                    {% else %}
+                    Orders will appear here when customers place them.
+                    {% endif %}
+                </p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

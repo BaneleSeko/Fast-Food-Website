@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Us | Street Bites{% endblock %}
+
+{% block content %}
+<section class="contact-section">
+    <div class="contact-heading">
+        <p class="eyebrow">WE'RE HERE FOR YOU</p>
+        <h1>Get in <span>Touch</span></h1>
+        <p>Have a question about your order? We'd love to hear from you.</p>
+    </div>
+
+    <div class="contact-card">
+        <div class="contact-info">
+            <h2>Contact Street Bites</h2>
+            <p>Send us a message and we'll get back to you.</p>
+
+            <div class="contact-detail">
+                <strong>Location</strong>
+                <p>Amanzimtoti, KwaZulu-Natal</p>
+            </div>
+
+            <div class="contact-detail">
+                <strong>Call us</strong>
+                <p><a href="tel:{{ BUSINESS_PHONE|replace(' ', '') }}">{{ BUSINESS_PHONE }}</a></p>
+            </div>
+
+            <div class="contact-detail">
+                <strong>WhatsApp</strong>
+                <p>
+                    <a href="https://wa.me/{{ BUSINESS_WHATSAPP }}"
+                       target="_blank" rel="noopener noreferrer">
+                        Chat with us on WhatsApp
+                    </a>
+                </p>
+            </div>
+
+            <div class="contact-detail">
+                <strong>Opening hours</strong>
+                <p>Monday–Friday: 08:00am–19:00pm</p>
+                <p>Saturday–Sunday: 08:00am–18:00pm</p>
+            </div>
+        </div>
+
+        <div class="contact-form-container">
+            {% with messages = get_flashed_messages() %}
+                {% for message in messages %}
+                    <p class="flash-message">{{ message }}</p>
+                {% endfor %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('contact_us') }}">
+                <label for="name">Full name</label>
+                <input type="text" id="name" name="name"
+                       maxlength="100" required>
+
+                <label for="email">Email address</label>
+                <input type="email" id="email" name="email"
+                       maxlength="254" required>
+
+                <label for="subject">Subject</label>
+                <input type="text" id="subject" name="subject"
+                       maxlength="150" required>
+
+                <label for="message">Your message</label>
+                <textarea id="message" name="message"
+                          rows="5" maxlength="3000" required></textarea>
+
+                <button type="submit" class="button">
+                    Send Message
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
